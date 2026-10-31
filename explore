@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Deep Song Explorer CLI launcher
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+if [ -f "$DIR/.venv/bin/python3" ]; then
+    "$DIR/.venv/bin/python3" -m song_explorer.cli "$@"
+else
+    python3 -m song_explorer.cli "$@"
+fi
