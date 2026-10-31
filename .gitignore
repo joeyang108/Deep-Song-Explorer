@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+env/
+
+# Database & Media Cache
+*.db
+*.sqlite3
+data/*.mp3
+data/*.wav
+data/*.flac
+data/*.m4a
+
+# IDE / System
+.DS_Store
+.gemini/
