@@ -4,7 +4,30 @@ This document captures upcoming phases, bonus ideas, and potential rabbit holes 
 
 ---
 
-## 🗂️ Phased Backlog
+## 🏁 Phase Status Overview
+
+| Phase | Milestone | Status | Notes |
+| :--- | :--- | :---: | :--- |
+| **Phase 1** | Making-Of Dossier & Article Finder (CLI) | **✅ LIVE** | 2-tier search, article extractor, gear scanner, Rich CLI, local caching |
+| **Phase 1.5** | Local Web UI Dashboard | **⏳ Next Up** | Sleek dark-mode browser view on top of the existing Python engine |
+| **Phase 2** | Lineage & Credits Engine (Discogs/MusicBrainz) | **📋 Queued** | Personnel, session players, recording studios, sample trees |
+| **Phase 3** | Structural & Musical Anatomy | **📋 Queued** | BPM, key, chord progressions, arrangement breakdown |
+| **Phase 4** | Stem Separation & Multi-Track Visualizer | **🔮 Future** | Local Demucs stem isolation, waveform player |
+
+---
+
+## 🗂️ Upcoming Work
+
+### Phase 1.5: Web UI & Rich Media Enhancements (Next Session)
+- [ ] **Lightweight Local Web Dashboard:**
+  - Build a dark-mode browser dashboard (FastAPI/Flask + Vanilla CSS).
+  - Search bar with instant autocomplete / history of recent searches.
+  - Collapsible dossier sections (Creative Spark, In the Studio, Quotes, Trivia).
+  - Clickable card archive for primary source articles.
+- [ ] **Embedded Audio/Video Preview:**
+  - Embed YouTube or audio player so you can listen to the track or isolated solo while reading the dossier.
+- [ ] **Export Feature:**
+  - Single-click export of the compiled dossier to a clean Markdown or PDF document.
 
 ### Phase 2: Lineage & Credits Engine
 - [ ] **Discogs API Integration:** Fetch release credits, engineers, mixers, masterers, and session musicians.
@@ -33,5 +56,4 @@ This document captures upcoming phases, bonus ideas, and potential rabbit holes 
 - [ ] **Spotify / Apple Music Integration:** Import a user's currently playing track or playlist directly into the explorer.
 - [ ] **Equipment & Gear Database Matcher:** Match gear mentioned in articles (e.g. "Roland Juno-106", "Neumann U47", "Fairchild 670") to known vintage gear specs and sound profiles.
 - [ ] **"In The Studio" Photo Scraper:** Find verified studio photography from the recording sessions of historic albums.
-- [ ] **Export to Markdown / PDF:** Export a complete, formatted "Song Dossier" booklet for personal archives or vinyl listening sessions.
 - [ ] **Podcast & Video Essays Aggregator:** Surface episodes of *Song Exploder*, Rick Beato's *What Makes This Song Great*, or *NPR All Songs Considered* discussing the track.
