@@ -5,3 +5,7 @@ duckduckgo_search>=6.0.0
 
 # Terminal UI & Formatting
 rich>=13.7.0
+
+# Mobile Web Server & API
+fastapi>=0.110.0
+uvicorn>=0.28.0

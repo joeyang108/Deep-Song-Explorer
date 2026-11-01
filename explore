@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 # Deep Song Explorer CLI launcher
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+if [ "$1" = "serve" ] || [ "$1" = "--serve" ] || [ "$1" = "web" ]; then
+    shift
+    if [ -f "$DIR/.venv/bin/python3" ]; then
+        exec "$DIR/.venv/bin/python3" -m song_explorer.server "$@"
+    else
+        exec python3 -m song_explorer.server "$@"
+    fi
+fi
+
 if [ -f "$DIR/.venv/bin/python3" ]; then
     "$DIR/.venv/bin/python3" -m song_explorer.cli "$@"
 else

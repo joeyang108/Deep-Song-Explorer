@@ -107,3 +107,17 @@ Forces a fresh web search and re-synthesis:
 ```bash
 ./explore "Steely Dan" "Deacon Blues" --no-cache
 ```
+
+#### 4. Mobile PWA & Web Server
+Launch the mobile web server locally:
+```bash
+./explore serve
+```
+Open `http://localhost:8000` in your browser. On mobile devices (iOS Safari or Android Chrome), tap **"Add to Home Screen"** to install as a standalone full-screen native-feeling app!
+
+#### 5. Render 1-Click Cloud Deployment
+The repository includes `render.yaml` for instant deployment on [Render](https://render.com):
+- **Runtime:** Python 3
+- **Build Command:** `pip install -r requirements.txt`
+- **Start Command:** `uvicorn song_explorer.server:app --host 0.0.0.0 --port $PORT`
+- **Env Vars (Optional):** `GEMINI_API_KEY` for Google Gemini AI (DuckDuckGo AI chat fallback is zero-config out-of-the-box).

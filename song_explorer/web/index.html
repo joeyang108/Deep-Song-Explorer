@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Deep Song Explorer 🎵🔍 | Song Anatomy &amp; Studio Lore</title>
+  <meta name="description" content="Tactically rich song exploration, studio sanctuary heritage, discography timelines, and grounded AI musicologist analysis for true music obsessives.">
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="theme-color" content="#090d16">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SongExplorer">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/icon.svg">
+
+  <!-- Typography: Google Fonts (Outfit & Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="app-container" class="app-container">
+    
+    <!-- Top Sticky Header Bar -->
+    <header id="main-header" class="main-header">
+      <div class="header-left">
+        <div class="logo-disc" id="header-logo-disc">
+          <img src="/icon.svg" alt="Song Explorer Logo" class="spin-disc-icon">
+        </div>
+        <div class="title-group">
+          <h1 class="app-title">DEEP SONG EXPLORER</h1>
+          <span class="app-subtitle">Studio Lore &amp; Anatomy</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="search-toggle-btn" class="icon-btn" aria-label="Toggle Search Panel" title="Search new track">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <button id="refresh-dossier-btn" class="icon-btn" aria-label="Refresh Dossier from Web" title="Re-scan and refresh">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Collapsible Search & History Drawer -->
+    <section id="search-drawer" class="search-drawer">
+      <form id="search-form" class="search-form">
+        <div class="input-row">
+          <div class="input-field">
+            <label for="artist-input">Artist</label>
+            <input type="text" id="artist-input" placeholder="e.g. Steely Dan, Massive Attack" required autocomplete="off" autocorrect="off">
+          </div>
+          <div class="input-field">
+            <label for="song-input">Song Title</label>
+            <input type="text" id="song-input" placeholder="e.g. Deacon Blues, Paradise Circus" required autocomplete="off" autocorrect="off">
+          </div>
+        </div>
+        <button type="submit" id="search-submit-btn" class="primary-btn">
+          <span>Dig Into Song</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </form>
+
+      <!-- Quick-Picks History Carousel -->
+      <div class="history-tray">
+        <div class="tray-title">
+          <span>⚡ Instant Cache Demos</span>
+          <span id="history-count" class="badge">0</span>
+        </div>
+        <div id="history-chips-container" class="chips-scroll">
+          <!-- Populated dynamically via JS -->
+          <div class="chip-skeleton">Loading cached songs...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-card">
+        <div class="pulse-vinyl">
+          <img src="/icon.svg" alt="Loading vinyl" class="loading-vinyl-img">
+        </div>
+        <h3 id="loading-headline">Synthesizing Dossier...</h3>
+        <p id="loading-step-msg">Scanning primary source archives &amp; MusicBrainz...</p>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="main-content">
+
+      <!-- Hero Track Card -->
+      <section id="hero-card" class="hero-card">
+        <div class="hero-badges">
+          <span id="badge-source" class="pill pill-gold">⚡ Instant Cache</span>
+          <span id="badge-resolved" class="pill pill-green hidden">Canonical Resolved</span>
+        </div>
+        <h2 id="hero-song-title" class="hero-song-title">Select or Search a Song</h2>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <span class="meta-label">ARTIST</span>
+            <span id="hero-artist-name" class="meta-value">—</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">ALBUM</span>
+            <span id="hero-album-name" class="meta-value">—</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">YEAR</span>
+            <span id="hero-release-year" class="meta-value">—</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Segmented Tab Navigation -->
+      <nav id="tabs-navigation" class="tabs-nav" aria-label="Dossier Sections">
+        <button id="btn-tab-spark" class="tab-btn active" data-tab="tab-spark">
+          <span class="tab-icon">💡</span>
+          <span class="tab-text">Spark &amp; Lore</span>
+        </button>
+        <button id="btn-tab-sanctuary" class="tab-btn" data-tab="tab-sanctuary">
+          <span class="tab-icon">🎙️</span>
+          <span class="tab-text">Sanctuary</span>
+        </button>
+        <button id="btn-tab-timeline" class="tab-btn" data-tab="tab-timeline">
+          <span class="tab-icon">⏳</span>
+          <span class="tab-text">Timeline</span>
+        </button>
+        <button id="btn-tab-chat" class="tab-btn" data-tab="tab-chat">
+          <span class="tab-icon">💬</span>
+          <span class="tab-text">AI Chat</span>
+        </button>
+      </nav>
+
+      <!-- Tab 1: Spark & Lore -->
+      <section id="tab-spark" class="tab-panel active">
+        <div class="panel-card spark-card">
+          <div class="card-header">
+            <span class="card-tag">Origins &amp; Sessions</span>
+            <h3 class="card-title">The Creative Spark</h3>
+          </div>
+          <div id="spark-body-content" class="card-body markdown-body">
+            Select a song above to read verified accounts of the creative spark, songwriting genesis, and session breakthroughs.
+          </div>
+        </div>
+
+        <div class="panel-card trivia-card">
+          <div class="card-header">
+            <span class="card-tag">Happy Accidents &amp; Trivia</span>
+            <h3 class="card-title">Session Breakouts</h3>
+          </div>
+          <div id="trivia-container" class="trivia-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="panel-card sources-card">
+          <div class="card-header">
+            <span class="card-tag">Archived Primary Sources</span>
+            <h3 class="card-title">Deep-Dive Article Archive</h3>
+          </div>
+          <div id="articles-container" class="articles-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: Studio Sanctuary -->
+      <section id="tab-sanctuary" class="tab-panel">
+        <div class="panel-card sanctuary-facility-card">
+          <div class="facility-hero">
+            <div class="facility-icon">🏛️</div>
+            <div class="facility-meta">
+              <span class="card-tag">Recording Sanctuary</span>
+              <h3 id="facility-name-text" class="facility-name">Facility Name</h3>
+              <p id="facility-location-text" class="facility-location">Location</p>
+            </div>
+          </div>
+          
+          <div class="narrative-box">
+            <h4 class="subhead">Why This Facility?</h4>
+            <p id="why-chosen-text" class="narrative-body">—</p>
+          </div>
+
+          <div class="landmarks-grid">
+            <div class="landmark-col">
+              <h4 class="subhead">Prior Landmark Albums</h4>
+              <ul id="prior-landmarks-list" class="badge-list"></ul>
+            </div>
+            <div class="landmark-col">
+              <h4 class="subhead">Era Contemporary Peers</h4>
+              <ul id="contemporary-peers-list" class="badge-list"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card producer-card">
+          <div class="card-header">
+            <span class="card-tag">Sound Architect Pedigree</span>
+            <h3 class="card-title">Producers &amp; Engineers</h3>
+          </div>
+          <div id="producers-container" class="producers-list">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Timeline -->
+      <section id="tab-timeline" class="tab-panel">
+        <div class="panel-card timeline-card">
+          <div class="card-header">
+            <span class="card-tag">Discography Position</span>
+            <h3 id="discography-summary-text" class="card-title">Studio Album Chronology</h3>
+          </div>
+          <p class="timeline-hint">Scroll through preceding and successor releases with AllMusic critical ratings:</p>
+          <div id="discography-timeline-container" class="discography-track">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 4: AI Chat Assistant -->
+      <section id="tab-chat" class="tab-panel">
+        <div class="chat-container">
+          <div class="chat-header-banner">
+            <div class="chat-assistant-avatar">🤖</div>
+            <div class="chat-assistant-info">
+              <span class="assistant-name">AI Musicologist</span>
+              <span class="assistant-status">Grounded in verified primary sources</span>
+            </div>
+          </div>
+
+          <div id="chat-messages-scroll" class="chat-messages">
+            <div class="message assistant-message">
+              <div class="msg-bubble">
+                👋 Hello! I am primed with the entire primary source dossier for this song and album. Ask me about the studio microphones, creative tensions, lyrical backstories, or what gear defined this sound!
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick prompts suggestions -->
+          <div class="quick-prompts-bar">
+            <button class="quick-prompt-btn" data-prompt="What gear or recording technique made this track unique?">🎛️ Unique Gear &amp; Tone</button>
+            <button class="quick-prompt-btn" data-prompt="Why did the band choose this specific studio?">🏛️ Why This Studio?</button>
+            <button class="quick-prompt-btn" data-prompt="Were there any happy accidents or arguments in the sessions?">💥 Session Conflicts</button>
+          </div>
+
+          <!-- Chat Input -->
+          <form id="chat-form" class="chat-form">
+            <input type="text" id="chat-input" placeholder="Ask anything about this song..." autocomplete="off">
+            <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="Send message">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

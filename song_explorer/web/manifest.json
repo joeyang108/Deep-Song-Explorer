@@ -1,0 +1,18 @@
+{
+  "name": "Deep Song Explorer",
+  "short_name": "SongExplorer",
+  "description": "Tactically rich song exploration, studio sanctuary lineage, and music analysis",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512 192x192 128x128 64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
