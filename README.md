@@ -13,15 +13,17 @@ graph LR
     P3 --> P4["Phase 4: Stem Separation<br>(Demucs Audio Isolator)"]
 ```
 
-### **Phase 1: The "Making-Of" Dossier (Status: ✅ LIVE)**
-- **Focus:** Curating high-signal articles, studio session notes, oral histories, gear breakdowns, and trivia for any song.
-- **Engine:** 2-tier search (curated gold-standards + open-web intent filtering) via `ddgs` with zero API keys required.
-- **Synthesizer:** Automatically extracts creative origins, studio recording lore, detected gear (*Rhodes*, *Neumann*, *Studer*, *Moog*), key quotes, and verified source links.
-- **Interface:** High-visibility Rich terminal CLI (`./explore`) with sub-second local disk caching (`data/cache/`).
+### **Phase 1 & 1.2: Making-Of Dossier & Studio Sanctuary (Status: ✅ LIVE)**
+- **Focus:** Curating deep-dive articles, studio session notes, oral histories, album timelines, and studio lineage.
+- **Engine:** Dual-Tier Search (concurrent song deep dives + album retrospectives) via `ddgs` with zero API keys required.
+- **Auto-Resolution:** MusicBrainz integration for canonical track correction (e.g. *"Paradise Circle"* → *"Paradise Circus"*) and studio album identification.
+- **Album Context & Timeline:** Chronological discography timeline displaying 3 preceding and 3 successor studio albums with release dates and AllMusic ratings.
+- **Studio Sanctuary & Heritage:** Recording facility and location, career narrative why chosen, prior landmark albums, contemporary era peers, and producer pedigree with milestone works.
+- **Gen AI Chat Assistant:** Interactive terminal assistant grounded in the compiled dossier and scraped articles.
 
-### **Phase 2: Lineage & Credits Engine**
+### **Phase 2: Lineage & Credits Engine (Inspired by Spotify SongDNA)**
 - **Personnel & Credits:** Studio engineers, producers, session musicians, guest features via Discogs / MusicBrainz.
-- **Sample Lineage:** What the track sampled, who sampled it, and direct interpolations.
+- **Sample Lineage:** WhoSampled integration tracing direct samples, covers, and who sampled the track.
 
 ### **Phase 3: Structural & Musical Anatomy**
 - Musical key, BPM, chord progressions, and arrangement visualizer (Intro / Verse / Chorus / Bridge / Outro).
@@ -49,13 +51,20 @@ Deep-Song-Explorer/
 │   ├── __init__.py
 │   ├── config.py           # Settings and search domain presets
 │   ├── cli.py              # Rich terminal interface & interactive prompt
-│   └── articles/           # Phase 1: Article finder & dossier builder
+│   ├── chat.py             # Phase 1.2: Interactive Gen AI Chat Assistant
+│   ├── metadata/           # MusicBrainz resolver & AllMusic ratings
+│   │   ├── __init__.py
+│   │   └── musicbrainz.py
+│   └── articles/           # Article finder, studio heritage & synthesizer
 │       ├── __init__.py
-│       ├── models.py       # Dataclasses: Song, Article, SongDossier
-│       ├── search.py       # 2-Tier targeted query search engine
-│       ├── extractor.py    # Article parsing, quote & gear extractor
+│       ├── models.py       # Dataclasses: Song, Article, SongDossier, StudioHeritage
+│       ├── search.py       # Dual-Tier search (song deep-dives + album lore)
+│       ├── extractor.py    # Article parsing & quote extractor
+│       ├── studios.py      # Studio Sanctuary & landmark lineage database
+│       ├── producers.py    # Producer pedigree & collaborator resolver
 │       └── synthesizer.py  # Lore synthesizer & cache manager
-└── tests/                  # Unit and integration test suite
+└── tests/                  # Automated unit and integration test suite
+    └── test_sprint_a.py    # Phase 1.2 test suite
 ```
 
 ---

@@ -1,8 +1,8 @@
-"""Targeted search engine for music making-of articles and studio lore."""
+"""Targeted search engine for music making-of articles, studio lore, and album retrospectives."""
 import re
 import urllib.parse
-from typing import List, Dict, Set
-from .models import Article, Song
+from typing import Dict, List, Optional, Set, Tuple
+from .models import Article
 from ..config import CURATED_SOURCES
 
 # Domains to explicitly discard (low signal, lyrics, streaming, chords)
@@ -27,8 +27,8 @@ def get_curated_domain_map() -> Dict[str, Dict[str, str]]:
     return mapping
 
 
-def generate_queries(artist: str, song: str) -> List[str]:
-    """Generates natural, high-intent search queries."""
+def generate_song_queries(artist: str, song: str) -> List[str]:
+    """Generates natural, high-intent search queries for a specific song."""
     clean_artist = artist.strip().replace('"', '')
     clean_song = song.strip().replace('"', '')
     
@@ -37,13 +37,26 @@ def generate_queries(artist: str, song: str) -> List[str]:
         f'"{clean_artist}" "{clean_song}" in the studio recording',
         f'"{clean_artist}" "{clean_song}" oral history interview',
         f'"{clean_artist}" "{clean_song}" Sound On Sound',
-        f'"{clean_artist}" "{clean_song}" Tape Op',
-        f'"{clean_artist}" "{clean_song}" Song Exploder',
-        f'"{clean_artist}" "{clean_song}" behind the song'
+        f'"{clean_artist}" "{clean_song}" behind the song',
+        f'"{clean_artist}" "{clean_song}" Song Exploder'
     ]
 
 
-def _categorize_url(url: str) -> Dict[str, str]:
+def generate_album_queries(artist: str, album: str) -> List[str]:
+    """Generates high-intent search queries for album-wide production lore."""
+    clean_artist = artist.strip().replace('"', '')
+    clean_album = album.strip().replace('"', '')
+    
+    return [
+        f'"{clean_artist}" "{clean_album}" in the studio recording',
+        f'"{clean_artist}" "{clean_album}" making of',
+        f'"{clean_artist}" "{clean_album}" Sound On Sound',
+        f'"{clean_artist}" "{clean_album}" Tape Op interview',
+        f'"{clean_artist}" "{clean_album}" retrospective oral history'
+    ]
+
+
+def _categorize_url(url: str, is_album: bool = False) -> Dict[str, str]:
     """Identifies the publication name and category from a URL."""
     domain_map = get_curated_domain_map()
     parsed = urllib.parse.urlparse(url)
@@ -51,16 +64,18 @@ def _categorize_url(url: str) -> Dict[str, str]:
 
     for domain, info in domain_map.items():
         if domain in netloc:
-            return info
+            cat = "album_retrospective" if is_album else info["category"]
+            return {"name": info["name"], "category": cat}
 
+    default_cat = "album_retrospective" if is_album else "deep_dive"
     if "wikipedia.org" in netloc:
         return {"name": "Wikipedia (Studio & Lore)", "category": "encyclopedic_lore"}
     if any(k in netloc for k in ["theguardian", "rollingstone", "stereogum", "billboard", "npr", "faroutmagazine", "spin"]):
-        return {"name": netloc.replace("www.", ""), "category": "oral_history"}
+        return {"name": netloc.replace("www.", ""), "category": "album_retrospective" if is_album else "oral_history"}
     if any(k in netloc for k in ["gearnews", "musictech", "soundonsound", "tapeop", "prosoundnetwork", "reverb"]):
-        return {"name": netloc.replace("www.", ""), "category": "studio_craft"}
+        return {"name": netloc.replace("www.", ""), "category": "album_studio" if is_album else "studio_craft"}
 
-    return {"name": netloc.replace("www.", ""), "category": "deep_dive"}
+    return {"name": netloc.replace("www.", ""), "category": default_cat}
 
 
 def _is_junk_url(url: str) -> bool:
@@ -128,33 +143,73 @@ def execute_ddg_search(query: str, max_results: int = 4) -> List[Dict[str, str]]
     return results
 
 
-def search_articles(artist: str, song: str, max_total: int = 7) -> List[Article]:
-    """Finds high-signal making-of and studio craft articles for a given song."""
-    queries = generate_queries(artist, song)
+def search_dual_tier(
+    artist: str,
+    song: str,
+    album: Optional[str] = None,
+    max_song_articles: int = 4,
+    max_album_articles: int = 4
+) -> Tuple[List[Article], List[Article]]:
+    """Always searches for BOTH Song Articles AND Album Retrospectives.
+    
+    Returns:
+        (song_articles, album_articles)
+    """
     seen_urls: Set[str] = set()
-    articles: List[Article] = []
+    song_articles: List[Article] = []
+    album_articles: List[Article] = []
 
-    for query_str in queries:
-        raw_items = execute_ddg_search(query_str, max_results=3)
-        for item in raw_items:
-            url = item["url"]
+    # 1. Collect Song-Specific Articles
+    song_queries = generate_song_queries(artist, song)
+    for q in song_queries:
+        items = execute_ddg_search(q, max_results=3)
+        for it in items:
+            url = it["url"]
             if not url or url in seen_urls or _is_junk_url(url):
                 continue
-            
             seen_urls.add(url)
-            cat_info = _categorize_url(url)
-            
-            articles.append(Article(
-                title=item["title"],
+            cat_info = _categorize_url(url, is_album=False)
+            song_articles.append(Article(
+                title=it["title"],
                 url=url,
                 source_name=cat_info["name"],
                 category=cat_info["category"],
-                snippet=item["snippet"]
+                snippet=it["snippet"],
+                is_album_level=False,
             ))
-
-            if len(articles) >= max_total:
+            if len(song_articles) >= max_song_articles:
                 break
-        if len(articles) >= max_total:
+        if len(song_articles) >= max_song_articles:
             break
 
-    return articles
+    # 2. Collect Album-Specific Articles
+    target_album = album or song
+    album_queries = generate_album_queries(artist, target_album)
+    for q in album_queries:
+        items = execute_ddg_search(q, max_results=3)
+        for it in items:
+            url = it["url"]
+            if not url or url in seen_urls or _is_junk_url(url):
+                continue
+            seen_urls.add(url)
+            cat_info = _categorize_url(url, is_album=True)
+            album_articles.append(Article(
+                title=it["title"],
+                url=url,
+                source_name=cat_info["name"],
+                category=cat_info["category"],
+                snippet=it["snippet"],
+                is_album_level=True,
+            ))
+            if len(album_articles) >= max_album_articles:
+                break
+        if len(album_articles) >= max_album_articles:
+            break
+
+    return song_articles, album_articles
+
+
+def search_articles(artist: str, song: str, max_total: int = 7) -> List[Article]:
+    """Legacy helper for backward compatibility."""
+    song_arts, alb_arts = search_dual_tier(artist, song, max_song_articles=4, max_album_articles=3)
+    return song_arts + alb_arts
